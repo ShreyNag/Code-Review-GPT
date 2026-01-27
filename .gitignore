@@ -1,0 +1,23 @@
+# Secrets & Credentials
+.env
+
+# Python Environment
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.env/
+venv/
+ENV/
+
+# Database / Local Storage
+*.db
+*.sqlite3
+
+# IDE Specific
+.vscode/
+.idea/
+
+# OS Specific
+.DS_Store
+Thumbs.db
