@@ -22,7 +22,7 @@ load_dotenv()
 
 app = FastAPI(title="Code-Review-GPT")
 
-# 3. Initialize PostgreSQL tables on startup
+# 3. Initialize MySQL tables on startup
 init_db()
 
 # 4. Configure Gemini AI with the exact preview model found in your environment
@@ -32,7 +32,7 @@ MODEL_NAME = 'models/gemini-3-flash-preview'
 @app.post("/review", response_model=CodeReviewResponse)
 async def create_code_review(submission: CodeSubmission, db: Session = Depends(get_db)):
     """
-    Sends code to Gemini 3 Flash, saves review to PostgreSQL, and returns feedback.
+    Sends code to Gemini 3 Flash, saves review to MySQL, and returns feedback.
     """
     prompt = (
         "You are an expert software engineer. Provide a detailed code review for this "
@@ -50,7 +50,7 @@ async def create_code_review(submission: CodeSubmission, db: Session = Depends(g
             
         feedback = response.text
 
-        # Save the result into your PostgreSQL database
+        # Save the result into your MySQL database
         new_review = CodeReview(
             code_snippet=submission.code,
             ai_feedback=feedback
@@ -70,7 +70,7 @@ async def create_code_review(submission: CodeSubmission, db: Session = Depends(g
 @app.get("/history", response_model=List[CodeReviewResponse])
 async def get_review_history(db: Session = Depends(get_db)):
     """
-    Fetches all past reviews from PostgreSQL, sorted by date.
+    Fetches all past reviews from MySQL, sorted by date.
     """
     return db.query(CodeReview).order_by(CodeReview.created_at.desc()).all()
 
@@ -90,7 +90,7 @@ async def serve_index():
 @app.delete("/delete/{review_id}")
 async def delete_review(review_id: int, db: Session = Depends(get_db)):
     """
-    Finds a review by ID in PostgreSQL and deletes it permanently.
+    Finds a review by ID in MySQL and deletes it permanently.
     """
     # 1. Look for the review in the database
     review = db.query(CodeReview).filter(CodeReview.id == review_id).first()
@@ -111,7 +111,7 @@ from fastapi.responses import Response
 
 @app.get("/download/{review_id}")
 async def download_pdf(review_id: int, db: Session = Depends(get_db)):
-    # 1. Fetch the specific review from PostgreSQL
+    # 1. Fetch the specific review from MySQL
     review = db.query(CodeReview).filter(CodeReview.id == review_id).first()
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")
